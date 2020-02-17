@@ -33,15 +33,36 @@ extern "C" {
 	void crawlist_delete(CRawList* l);
 
 
-	/* Addition operations */
+	/* Push operations */
 
 	status_t crawlist_push_back(CRawList* l, const void* ptr, const size_t size);
 	status_t crawlist_push_front(CRawList* l, const void* ptr, const size_t size);
 	status_t crawlist_add(CRawList* l, const size_t index, const void* ptr, const size_t size);
+	status_t crawlist_set(CRawList* l, const size_t index, const void* ptr, const size_t size);
+
+
+	/* Get operations */
+
+	status_t crawlist_back(CRawList* l, void** ptr);
+	status_t crawlist_front(CRawList* l, void** ptr);
+	status_t crawlist_get(CRawList* l, const size_t index, void** ptr);
+
+
+	/* Find operations */
+
+	const CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size);
+	const CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t));
+	const CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t));
 
 
 	/* Erase operations */
 
+	status_t crawlist_erase_back(CRawList* l);
+	status_t crawlist_erase_front(CRawList* l);
+	status_t crawlist_erase(CRawList* l, const size_t index);
+	const CListNode* crawlist_erase_if(CRawList* l, const void* ptr, const size_t size);
+	const CListNode* crawlist_erase_ifc(CRawList* l, int (*criteria)(const void*, const size_t));
+	const CListNode* crawlist_erase_ifcd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t));
 	void crawlist_clear(CRawList* l);
 
 

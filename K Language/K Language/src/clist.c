@@ -202,7 +202,167 @@ status_t crawlist_add(CRawList* l, const size_t index, const void* ptr, const si
 	return S_OK;
 }
 
+status_t crawlist_set(CRawList* l, const size_t index, const void* ptr, const size_t size)
+{
+	if (index >= l->size)
+		return S_OUT_OF_RANGE;
 
+	Node* n;
+	status_t status;
+	if (index == 0)
+		n = l->head;
+	else if (index == l->size - 1)
+		n = l->tail;
+	else
+	{
+		status = node_find(&n, l, index);
+		if (status != S_OK)
+			return status;
+	}
+
+	return node_set(n, ptr, size);
+}
+
+
+status_t crawlist_back(CRawList* l, void** ptr)
+{
+	if (!l->head)
+		return S_OUT_OF_RANGE;
+
+	*ptr = l->head->data;
+	return S_OK;
+}
+
+status_t crawlist_front(CRawList* l, void** ptr)
+{
+	if (!l->tail)
+		return S_OUT_OF_RANGE;
+
+	*ptr = l->tail->data;
+	return S_OK;
+}
+
+status_t crawlist_get(CRawList* l, const size_t index, void** ptr)
+{
+	if (index >= l->size)
+		return S_OUT_OF_RANGE;
+
+	Node* n;
+	status_t status;
+	if (index == 0)
+		n = l->head;
+	else if (index == l->size - 1)
+		n = l->tail;
+	else
+	{
+		status = node_find(&n, l, index);
+		if (status != S_OK)
+			return status;
+	}
+
+	*ptr = n->data;
+	return S_OK;
+}
+
+const CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size)
+{
+	for (Node* n = l->head; n; n = n->next)
+		if (memcmp(n->data, ptr, min(n->data_size, size)) == 0)
+			return n;
+	return NULL;
+}
+
+const CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t))
+{
+	for (Node* n = l->head; n; n = n->next)
+		if (criteria(n->data, n->data_size))
+			return n;
+	return NULL;
+}
+
+const CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t))
+{
+	for (Node* n = l->head; n; n = n->next)
+		if (criteria(extern_data, n->data, n->data_size))
+			return n;
+	return NULL;
+}
+
+
+
+
+
+status_t crawlist_erase_back(CRawList* l)
+{
+	if (!l->head)
+		return S_OUT_OF_RANGE;
+
+	if (l->head == l->tail)
+	{
+		node_delete(l->head);
+		l->head = l->tail = NULL;
+		l->size = 0;
+
+		return S_OK;
+	}
+
+	Node* n = l->tail;
+	l->tail = n->prev;
+	l->tail->next = NULL;
+	node_delete(n);
+
+	--l->size;
+	return S_OK;
+}
+
+status_t crawlist_erase_front(CRawList* l)
+{
+	if (!l->head)
+		return S_OUT_OF_RANGE;
+
+	if (l->head == l->tail)
+	{
+		node_delete(l->tail);
+		l->head = l->tail = NULL;
+		l->size = 0;
+
+		return S_OK;
+	}
+
+	Node* n = l->head;
+	l->head = n->next;
+	l->head->prev = NULL;
+	node_delete(n);
+
+	--l->size;
+	return S_OK;
+}
+
+status_t crawlist_erase(CRawList* l, const size_t index)
+{
+	if (index >= l->size)
+		return S_OUT_OF_RANGE;
+
+	Node* n;
+	status_t status;
+	if (index == 0)
+		n = l->head;
+	else if (index == l->size - 1)
+		n = l->tail;
+	else
+	{
+		status = node_find(&n, l, index);
+		if (status != S_OK)
+			return status;
+	}
+
+	n->prev->next = n->next;
+	n->next->prev = n->prev;
+	node_delete(n);
+
+	--l->size;
+	return S_OK;
+}
 
 void crawlist_clear(CRawList* l)
 {
