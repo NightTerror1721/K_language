@@ -49,7 +49,7 @@ extern "C" {
 	/* Raw data operations */
 
 	status_t cbuf_write(CBuffer* b, const void* ptr, const size_t size);
-	//status_t cbuf_read(CBuffer* b, void* ptr, const size_t ptr_buffer_size);
+	status_t cbuf_read(CBuffer* b, void* ptr, const size_t ptr_buffer_size);
 
 
 	/* inline functions */

@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "utils/cbuffer.h"
+#include "utils/clist.h"
 
 
 int main(int argc, char** argv)
@@ -35,6 +36,15 @@ int main(int argc, char** argv)
 
 
 	cbuf_delete(b);
+
+
+
+	CList(int) list;
+
+	clist_init(&list);
+
+	clist_push_back(&list, 50);
+
 
 	return 0;
 }

@@ -207,7 +207,7 @@ status_t cbuf_vscanf(CBuffer* b, const char* fmt, va_list vp)
 	va_end(args);
 
 	if (scanned > 0)
-		return cbuf_skip(b, (size_t)scanned);
+		cbuf_flush(b);
 	return S_OK;
 }
 
@@ -228,4 +228,9 @@ status_t cbuf_scanf(CBuffer* b, const char* fmt, ...)
 status_t cbuf_write(CBuffer* b, const void* ptr, const size_t size)
 {
 	return cbuf_puts_s(b, (const char*)ptr, size);
+}
+
+status_t cbuf_read(CBuffer* b, void* ptr, const size_t ptr_buffer_size)
+{
+	return cbuf_pops_s(b, (char*)ptr, ptr_buffer_size);
 }
