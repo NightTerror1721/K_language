@@ -136,9 +136,9 @@ status_t cbuf_vprintf(CBuffer* b, const char* fmt, va_list vp)
 		else if (printed == 0)
 			return S_OK;
 
-		if (printed > remaining)
+		if ((size_t)printed > remaining)
 		{
-			TRY_ENSURE(b, printed);
+			TRY_ENSURE(b, (size_t)(printed));
 			continue;
 		}
 		break;
@@ -233,4 +233,27 @@ status_t cbuf_write(CBuffer* b, const void* ptr, const size_t size)
 status_t cbuf_read(CBuffer* b, void* ptr, const size_t ptr_buffer_size)
 {
 	return cbuf_pops_s(b, (char*)ptr, ptr_buffer_size);
+}
+
+
+
+
+static int _cbuf_iterator_has_next(void* container, uintmax_t* data)
+{
+	CBuffer* b = (CBuffer*)container;
+	return *data == (uintmax_t)(-1) || *data + 1 < b->size;
+}
+
+static void* _cbuf_iterator_next(void* container, uintmax_t* data)
+{
+	CBuffer* b = (CBuffer*)container;
+	if (*data != (uintmax_t)(-1) && *data + 1 >= b->size)
+		return NULL;
+
+	return &b->data[++(*data)];
+}
+
+CIterator cbuf_iterator(CBuffer* b)
+{
+	return citer_make(b, (uintmax_t)(-1), &_cbuf_iterator_has_next, &_cbuf_iterator_next);
 }

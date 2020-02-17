@@ -21,6 +21,9 @@
     <ClCompile Include="src\clist.c">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\citer.c">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\utils\cbuffer.h">
@@ -35,5 +38,11 @@
     <ClInclude Include="include\utils\clist.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\utils\citer.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

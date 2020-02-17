@@ -22,6 +22,14 @@ int main(int argc, char** argv)
 	cbuf_printf(b, "%d + %d = %d; // %s;\n", 5, 10, 15, "esto es una prueba de string tocho");
 	printf("%ssalto guay\n", cbuf_rawdata(b));
 
+	CIterator it = cbuf_iterator(b);
+	cforeach(char, ch, &it)
+	{
+		if(ch)
+			putc(*ch, stdout);
+	}
+	putc('\n', stdout);
+
 
 	int c;
 	cbuf_popc(b, &c);
@@ -39,11 +47,11 @@ int main(int argc, char** argv)
 
 
 
-	CList(int) list;
+	/*CList(int) list;
 
 	clist_init(&list);
 
-	clist_push_back(&list, 50);
+	clist_push_back(&list, 50);*/
 
 
 	return 0;

@@ -46,12 +46,12 @@ extern "C" {
 
 	/* Default types */
 
-#define CPtrList CList(void*)
-#define CIntList CList(int)
-#define CUIntList CList(unsigned int)
-#define CFloatList CList(float)
-#define CCharList CList(char)
-#define CStringList CList(char*)
+	typedef CList(void*) CPtrList;
+	typedef CList(int) CIntList;
+	typedef CList(unsigned int) CUIntList;
+	typedef CList(float) CFloatList;
+	typedef CList(double) CDoubleList;
+	typedef CList(char*) CStringList;
 
 
 #ifdef __cplusplus

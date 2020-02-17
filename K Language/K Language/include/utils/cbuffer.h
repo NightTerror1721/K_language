@@ -9,6 +9,7 @@ extern "C" {
 #include <stdarg.h>
 
 #include "cerror.h"
+#include "citer.h"
 
 	typedef struct
 	{
@@ -50,6 +51,11 @@ extern "C" {
 
 	status_t cbuf_write(CBuffer* b, const void* ptr, const size_t size);
 	status_t cbuf_read(CBuffer* b, void* ptr, const size_t ptr_buffer_size);
+
+
+	/* Iterator funcs */
+
+	CIterator cbuf_iterator(CBuffer* b);
 
 
 	/* inline functions */
