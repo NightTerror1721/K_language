@@ -35,7 +35,7 @@ extern "C" {
 
 	void* citer_raw_next(CIterator* it);
 
-	status_t citer_foreach(CIterator* it, void (*action)(void*));
+	void citer_foreach(CIterator* it, void (*action)(void*));
 
 
 #define citer_container(_Iter, _ContainerType) ((_ContainerType*)(_Iter)->container)

@@ -2,3 +2,7 @@
 // por ejemplo, los nombres de funciones y macros.
 // Para obtener más información, consulte https://go.microsoft.com/fwlink/?linkid=865984
 #define cforeach(_Type, _Var, _Iter) for( _Type* _Var = citer_next((_Iter), _Type); citer_has_next(_Iter); _Var = citer_next((_Iter), _Type) )
+// Los archivos de sugerencia ayudan al IDE de Visual Studio a interpretar los identificadores de Visual C++
+// por ejemplo, los nombres de funciones y macros.
+// Para obtener más información, consulte https://go.microsoft.com/fwlink/?linkid=865984
+#define CList(_Type) struct { CRawList base; _Type temp; _Type* ref; }

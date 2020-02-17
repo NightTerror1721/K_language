@@ -40,7 +40,7 @@ void* citer_raw_next(CIterator* it)
 	return it->next(it->container, &it->data);
 }
 
-status_t citer_foreach(CIterator* it, void (*action)(void*))
+void citer_foreach(CIterator* it, void (*action)(void*))
 {
 	while (citer_has_next(it))
 		action(citer_raw_next(it));

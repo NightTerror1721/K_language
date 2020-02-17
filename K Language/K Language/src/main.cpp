@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv)
 {
-	CBuffer* b = cbuf_new();
+	/*CBuffer* b = cbuf_new();
 
 	cbuf_putc(b, 'h');
 	cbuf_putc(b, 'o');
@@ -43,8 +43,26 @@ int main(int argc, char** argv)
 	cbuf_scanf(b, "%d, %d, %d; %s", &x, &y, &z, text);
 
 
-	cbuf_delete(b);
+	cbuf_delete(b);*/
 
+	CIntList* list = (CIntList*) clist_new(int);
+
+	clist_push_back(list, 50);
+	clist_push_back(list, 100);
+	clist_push_back(list, 150);
+
+	clist_push_front(list, 200);
+
+
+	CIterator it = clist_iterator(list);
+	cforeach(int, i, &it)
+	{
+		printf("%d ", *i);
+	}
+	printf("\n");
+
+
+	clist_delete(list);
 
 
 	/*CList(int) list;
