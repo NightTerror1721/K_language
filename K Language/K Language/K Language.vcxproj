@@ -153,6 +153,7 @@
     <ClCompile Include="src\cbuffer.c" />
     <ClCompile Include="src\citer.c" />
     <ClCompile Include="src\clist.c" />
+    <ClCompile Include="src\cmap.c" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +161,7 @@
     <ClInclude Include="include\utils\cerror.h" />
     <ClInclude Include="include\utils\citer.h" />
     <ClInclude Include="include\utils\clist.h" />
+    <ClInclude Include="include\utils\cmap.h" />
     <ClInclude Include="include\utils\cutils.h" />
   </ItemGroup>
   <ItemGroup>

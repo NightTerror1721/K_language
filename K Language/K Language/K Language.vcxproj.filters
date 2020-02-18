@@ -24,6 +24,9 @@
     <ClCompile Include="src\citer.c">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\cmap.c">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\utils\cbuffer.h">
@@ -39,6 +42,9 @@
       <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="include\utils\citer.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\utils\cmap.h">
       <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
