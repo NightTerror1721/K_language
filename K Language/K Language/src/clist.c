@@ -7,7 +7,7 @@ typedef CListNode Node;
 
 /* Private functions */
 
-static Node* node_new(const size_t size)
+static Node* node_new(CRawList* owner, const size_t size)
 {
 	Node* n = cnew(Node);
 	if (!n)
@@ -20,6 +20,7 @@ static Node* node_new(const size_t size)
 		cdelete(n);
 		return NULL;
 	}
+	n->owner = owner;
 	n->next = n->prev = NULL;
 	return n;
 }
@@ -40,9 +41,9 @@ static status_t node_set(Node* n, const void* value, const size_t size)
 	return S_OK;
 }
 
-static status_t node_make(Node** dst, const void* ptr, const size_t size)
+static status_t node_make(Node** dst, CRawList* owner, const void* ptr, const size_t size)
 {
-	Node* n = node_new(size);
+	Node* n = node_new(owner, size);
 	if (!n)
 		return S_ALLOC_MEM_ERROR;
 
@@ -89,6 +90,39 @@ static status_t node_rawfind(Node** dst, Node* head, Node* tail, size_t index, i
 #define node_find(_Dst, _List, _Index) \
 	node_rawfind((_Dst), (_List)->head, (_List)->tail, (_Index), (_Index) > ((_List)->size / 2))
 
+status_t _erase_node(CRawList* l, Node* n)
+{
+	if (n->owner != l)
+		return S_INVALID_PARAMETER;
+
+	if (n == l->head)
+	{
+		if (n == l->tail)
+		{
+			l->head = l->tail = NULL;
+		}
+		else
+		{
+			l->head = n->next;
+			l->head->prev = NULL;
+		}
+	}
+	else if (n == l->tail)
+	{
+		l->tail = n->prev;
+		l->tail->next = NULL;
+	}
+	else
+	{
+		n->next->prev = n->prev;
+		n->prev->next = n->next;
+	}
+
+	--l->size;
+	node_delete(n);
+	return S_OK;
+}
+
 /* Public functions */
 
 status_t crawlist_init(CRawList* l)
@@ -126,7 +160,7 @@ status_t crawlist_push_back(CRawList* l, const void* ptr, const size_t size)
 		return S_UNEXPECTED_NULL;
 
 	Node* n;
-	status_t status = node_make(&n, ptr, size);
+	status_t status = node_make(&n, l, ptr, size);
 	if (status != S_OK)
 		return status;
 
@@ -151,7 +185,7 @@ status_t crawlist_push_front(CRawList* l, const void* ptr, const size_t size)
 		return S_UNEXPECTED_NULL;
 
 	Node* n;
-	status_t status = node_make(&n, ptr, size);
+	status_t status = node_make(&n, l, ptr, size);
 	if (status != S_OK)
 		return status;
 
@@ -187,7 +221,7 @@ status_t crawlist_add(CRawList* l, const size_t index, const void* ptr, const si
 		return status;
 
 	Node* n;
-	status = node_make(&n, ptr, size);
+	status = node_make(&n, l, ptr, size);
 	if (status != S_OK)
 		return status;
 
@@ -204,6 +238,9 @@ status_t crawlist_add(CRawList* l, const size_t index, const void* ptr, const si
 
 status_t crawlist_set(CRawList* l, const size_t index, const void* ptr, const size_t size)
 {
+	if (!l)
+		return S_UNEXPECTED_NULL;
+
 	if (index >= l->size)
 		return S_OUT_OF_RANGE;
 
@@ -226,15 +263,10 @@ status_t crawlist_set(CRawList* l, const size_t index, const void* ptr, const si
 
 status_t crawlist_back(CRawList* l, void** ptr)
 {
-	if (!l->head)
-		return S_OUT_OF_RANGE;
+	*ptr = NULL;
+	if (!l)
+		return S_UNEXPECTED_NULL;
 
-	*ptr = l->head->data;
-	return S_OK;
-}
-
-status_t crawlist_front(CRawList* l, void** ptr)
-{
 	if (!l->tail)
 		return S_OUT_OF_RANGE;
 
@@ -242,8 +274,25 @@ status_t crawlist_front(CRawList* l, void** ptr)
 	return S_OK;
 }
 
+status_t crawlist_front(CRawList* l, void** ptr)
+{
+	*ptr = NULL;
+	if (!l)
+		return S_UNEXPECTED_NULL;
+
+	if (!l->head)
+		return S_OUT_OF_RANGE;
+
+	*ptr = l->head->data;
+	return S_OK;
+}
+
 status_t crawlist_get(CRawList* l, const size_t index, void** ptr)
 {
+	*ptr = NULL;
+	if (!l)
+		return S_UNEXPECTED_NULL;
+
 	if (index >= l->size)
 		return S_OUT_OF_RANGE;
 
@@ -264,24 +313,33 @@ status_t crawlist_get(CRawList* l, const size_t index, void** ptr)
 	return S_OK;
 }
 
-const CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size)
+CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size)
 {
+	if (!l)
+		return NULL;
+
 	for (Node* n = l->head; n; n = n->next)
 		if (memcmp(n->data, ptr, min(n->data_size, size)) == 0)
 			return n;
 	return NULL;
 }
 
-const CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t))
+CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t))
 {
+	if (!l)
+		return NULL;
+
 	for (Node* n = l->head; n; n = n->next)
 		if (criteria(n->data, n->data_size))
 			return n;
 	return NULL;
 }
 
-const CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t))
+CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t))
 {
+	if (!l)
+		return NULL;
+
 	for (Node* n = l->head; n; n = n->next)
 		if (criteria(extern_data, n->data, n->data_size))
 			return n;
@@ -294,52 +352,31 @@ const CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteri
 
 status_t crawlist_erase_back(CRawList* l)
 {
+	if (!l)
+		return S_UNEXPECTED_NULL;
+
 	if (!l->head)
 		return S_OUT_OF_RANGE;
 
-	if (l->head == l->tail)
-	{
-		node_delete(l->head);
-		l->head = l->tail = NULL;
-		l->size = 0;
-
-		return S_OK;
-	}
-
-	Node* n = l->tail;
-	l->tail = n->prev;
-	l->tail->next = NULL;
-	node_delete(n);
-
-	--l->size;
-	return S_OK;
+	return _erase_node(l, l->tail);
 }
 
 status_t crawlist_erase_front(CRawList* l)
 {
+	if (!l)
+		return S_UNEXPECTED_NULL;
+
 	if (!l->head)
 		return S_OUT_OF_RANGE;
 
-	if (l->head == l->tail)
-	{
-		node_delete(l->tail);
-		l->head = l->tail = NULL;
-		l->size = 0;
-
-		return S_OK;
-	}
-
-	Node* n = l->head;
-	l->head = n->next;
-	l->head->prev = NULL;
-	node_delete(n);
-
-	--l->size;
-	return S_OK;
+	return _erase_node(l, l->head);
 }
 
 status_t crawlist_erase(CRawList* l, const size_t index)
 {
+	if (!l)
+		return S_UNEXPECTED_NULL;
+
 	if (index >= l->size)
 		return S_OUT_OF_RANGE;
 
@@ -356,16 +393,22 @@ status_t crawlist_erase(CRawList* l, const size_t index)
 			return status;
 	}
 
-	n->prev->next = n->next;
-	n->next->prev = n->prev;
-	node_delete(n);
+	return _erase_node(l, n);
+}
 
-	--l->size;
-	return S_OK;
+status_t crawlist_erase_node(CRawList* l, CListNode* node)
+{
+	if (!l)
+		return S_UNEXPECTED_NULL;
+
+	return _erase_node(l, node);
 }
 
 void crawlist_clear(CRawList* l)
 {
+	if (!l)
+		return;
+
 	Node *node = l->head, *next;
 	while (node)
 	{

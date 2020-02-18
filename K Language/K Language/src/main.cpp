@@ -61,6 +61,8 @@ int main(int argc, char** argv)
 	}
 	printf("\n");
 
+	printf("%d\n", *clist_get(list, 2));
+
 
 	clist_delete(list);
 

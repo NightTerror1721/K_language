@@ -9,8 +9,11 @@ extern "C" {
 #include "cutils.h"
 #include "citer.h"
 
+	typedef struct CRawList CRawList;
+
 	typedef struct CListNode
 	{
+		CRawList* owner;
 		struct CListNode* next;
 		struct CListNode* prev;
 		void* data;
@@ -18,13 +21,13 @@ extern "C" {
 
 	} CListNode;
 
-	typedef struct
+	struct CRawList
 	{
 		CListNode* head;
 		CListNode* tail;
 		size_t size;
 
-	} CRawList;
+	};
 
 
 	status_t crawlist_init(CRawList* l);
@@ -50,9 +53,9 @@ extern "C" {
 
 	/* Find operations */
 
-	const CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size);
-	const CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t));
-	const CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t));
+	CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size);
+	CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t));
+	CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t));
 
 
 	/* Erase operations */
@@ -60,9 +63,7 @@ extern "C" {
 	status_t crawlist_erase_back(CRawList* l);
 	status_t crawlist_erase_front(CRawList* l);
 	status_t crawlist_erase(CRawList* l, const size_t index);
-	const CListNode* crawlist_erase_if(CRawList* l, const void* ptr, const size_t size);
-	const CListNode* crawlist_erase_ifc(CRawList* l, int (*criteria)(const void*, const size_t));
-	const CListNode* crawlist_erase_ifcd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t));
+	status_t crawlist_erase_node(CRawList* l, CListNode* node);
 	void crawlist_clear(CRawList* l);
 
 
@@ -84,6 +85,21 @@ extern "C" {
 #define clist_push_back(_List, _Value) ((_List)->temp = (_Value), crawlist_push_back(&(_List)->base, &(_List)->temp, sizeof((_List)->temp)))
 #define clist_push_front(_List, _Value) ((_List)->temp = (_Value), crawlist_push_front(&(_List)->base, &(_List)->temp, sizeof((_List)->temp)))
 #define clist_add(_List, _Index, _Value) ((_List)->temp = (_Value), crawlist_add(&(_List)->base, (_Index), &(_List)->temp, sizeof((_List)->temp)))
+#define clist_set(_List, _Index, _Value) ((_List)->temp = (_Value), crawlist_set(&(_List)->base, (_Index), &(_List)->temp, sizeof((_List)->temp)))
+
+#define clist_back(_List) (crawlist_back(&(_List)->base, (void **)(&(_List)->ref)), (_List)->ref)
+#define clist_front(_List) (crawlist_front(&(_List)->base, (void **)(&(_List)->ref)), (_List)->ref)
+#define clist_get(_List, _Index) (crawlist_get(&(_List)->base, (_Index), (void **)(&(_List)->ref)), (_List)->ref)
+
+#define clist_find(_List, _Value) ((_List)->temp = (_Value), crawlist_find(&(_List)->base, &(_List)->temp, sizeof((_List)->temp)))
+#define clist_find_if(_List, _Criteria) crawlist_find_if(&(_List)->base, (_Criteria))
+#define clist_find_ifd(_List, _ExtraData, _Criteria) crawlist_find_ifd(&(_List)->base, (_ExtraData), (_Criteria))
+
+#define clist_erase_back(_List) crawlist_erase_back(&(_List)->base)
+#define clist_erase_front(_List) crawlist_erase_front(&(_List)->base)
+#define clist_erase(_List, _Index) crawlist_erase(&(_List)->base, (_Index))
+#define clist_erase_node(_List, _Node) crawlist_erase_node(&(_List)->base, (_Node))
+#define clist_clear(_List) crawlist_clear(&(_List)->base)
 
 #define clist_iterator(_List) crawlist_iterator(&(_List)->base)
 
