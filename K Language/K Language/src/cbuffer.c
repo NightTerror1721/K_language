@@ -35,6 +35,14 @@ status_t cbuf_init(CBuffer* b)
 	return S_OK;
 }
 
+void cbuf_deinit(CBuffer* b)
+{
+	cdelete(b->data);
+	b->data = NULL;
+	b->capacity = 0;
+	b->size = 0;
+}
+
 CBuffer* cbuf_new()
 {
 	CBuffer* b = cnew(CBuffer);
@@ -47,7 +55,10 @@ CBuffer* cbuf_new()
 void cbuf_delete(CBuffer* b)
 {
 	if (b)
+	{
+		cbuf_deinit(b);
 		cdelete(b);
+	}
 }
 
 status_t cbuf_ensure(CBuffer* b, const size_t new_capacity)

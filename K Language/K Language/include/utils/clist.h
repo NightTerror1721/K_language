@@ -31,6 +31,7 @@ extern "C" {
 
 
 	status_t crawlist_init(CRawList* l);
+	void crawlist_deinit(CRawList* l);
 
 	CRawList* crawlist_new();
 	void crawlist_delete(CRawList* l);
@@ -78,6 +79,7 @@ extern "C" {
 	void _clist_delete(void*);
 
 #define clist_init(_List) crawlist_init(&(_List)->base)
+#define clist_deinit(_List) crawlist_deinit(&(_List)->base)
 
 #define clist_new(_Type) _clist_new(sizeof(_Type))
 #define clist_delete(_List) _clist_delete((_List))

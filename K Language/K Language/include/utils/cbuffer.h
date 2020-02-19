@@ -20,6 +20,7 @@ extern "C" {
 	} CBuffer;
 
 	status_t cbuf_init(CBuffer* b);
+	void cbuf_deinit(CBuffer* b);
 
 	CBuffer* cbuf_new(void);
 	void cbuf_delete(CBuffer* b);

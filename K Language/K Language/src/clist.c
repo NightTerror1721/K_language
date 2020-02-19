@@ -135,6 +135,14 @@ status_t crawlist_init(CRawList* l)
 	return S_OK;
 }
 
+void crawlist_deinit(CRawList* l)
+{
+	if (!l)
+		return;
+
+	crawlist_clear(l);
+}
+
 CRawList* crawlist_new()
 {
 	CRawList* l = cnew(CRawList);
