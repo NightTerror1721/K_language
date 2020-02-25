@@ -54,12 +54,17 @@ int main(int argc, char** argv)
 	clist_push_front(list, 200);
 
 
-	CIterator it = clist_iterator(list);
+	/*CIterator it = clist_iterator(list);
 	cforeach(int, i, &it)
 	{
 		printf("%d ", *i);
 	}
-	printf("\n");
+	printf("\n");*/
+
+	for (CListIterator it = clist_iter_begin(list), iend = clist_iter_end(list); !clist_iter_equals(it, iend); clist_iter_next(&it))
+	{
+		printf("%d ", *clist_iter_get(list, it));
+	}
 
 	printf("%d\n", *clist_get(list, 2));
 

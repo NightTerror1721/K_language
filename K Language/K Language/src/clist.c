@@ -321,7 +321,7 @@ status_t crawlist_get(CRawList* l, const size_t index, void** ptr)
 	return S_OK;
 }
 
-CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size)
+CListIterator crawlist_find(CRawList* l, const void* ptr, const size_t size)
 {
 	if (!l)
 		return NULL;
@@ -332,7 +332,7 @@ CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size)
 	return NULL;
 }
 
-CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t))
+CListIterator crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t))
 {
 	if (!l)
 		return NULL;
@@ -343,7 +343,7 @@ CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size
 	return NULL;
 }
 
-CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t))
+CListIterator crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t))
 {
 	if (!l)
 		return NULL;
@@ -404,12 +404,12 @@ status_t crawlist_erase(CRawList* l, const size_t index)
 	return _erase_node(l, n);
 }
 
-status_t crawlist_erase_node(CRawList* l, CListNode* node)
+status_t crawlist_erase_node(CRawList* l, CListIterator it)
 {
 	if (!l)
 		return S_UNEXPECTED_NULL;
 
-	return _erase_node(l, node);
+	return _erase_node(l, it);
 }
 
 void crawlist_clear(CRawList* l)
@@ -432,34 +432,27 @@ void crawlist_clear(CRawList* l)
 
 
 
-#define __NOINIT_IT (uintmax_t)(-1)
-
-static int _crawlist_iterator_has_next(void* c, uintmax_t* d)
+CListIterator crawlist_iter_begin(CRawList* l) { return l->head; }
+CListIterator crawlist_iter_end(CRawList* l) { return NULL; }
+int crawlist_iter_equals(const CListIterator it0, const CListIterator it1) { return it0 == it1; }
+int crawlist_iter_next(CListIterator* it)
 {
-	return *d == __NOINIT_IT || ((Node*)(*d)) != NULL;
+	if (!(*it))
+		return 0;
+
+	*it = (*it)->next;
+	return 1;
+}
+int crawlist_iter_get(CListIterator it, void** ptr)
+{
+	if (!it)
+		return 0;
+
+	*ptr = it->data;
+	return 1;
 }
 
-static void* _crawlist_iterator_next(void* c, uintmax_t* d)
-{
-	CRawList* l = (CRawList*)c;
-	if (*d == __NOINIT_IT)
-	{
-		*d = (uintmax_t)(l->head);
-		return l->head ? l->head->data : NULL;
-	}
 
-	Node* n = (Node*)(*d);
-	if (!n)
-		return NULL;
-
-	*d = (uintmax_t)n->next;
-	return n->next ? n->next->data : NULL;
-}
-
-CIterator crawlist_iterator(CRawList* l)
-{
-	return citer_make(l, __NOINIT_IT, &_crawlist_iterator_has_next, &_crawlist_iterator_next);
-}
 
 
 
@@ -479,7 +472,7 @@ void _clist_delete(void* pl)
 {
 	if (pl)
 	{
-		crawlist_clear((CRawList*)pl);
+		crawlist_deinit((CRawList*)pl);
 		cdelete(pl);
 	}
 }

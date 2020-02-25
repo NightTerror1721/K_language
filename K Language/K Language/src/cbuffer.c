@@ -249,22 +249,8 @@ status_t cbuf_read(CBuffer* b, void* ptr, const size_t ptr_buffer_size)
 
 
 
-static int _cbuf_iterator_has_next(void* container, uintmax_t* data)
-{
-	CBuffer* b = (CBuffer*)container;
-	return *data == (uintmax_t)(-1) || *data + 1 < b->size;
-}
-
-static void* _cbuf_iterator_next(void* container, uintmax_t* data)
-{
-	CBuffer* b = (CBuffer*)container;
-	if (*data != (uintmax_t)(-1) && *data + 1 >= b->size)
-		return NULL;
-
-	return &b->data[++(*data)];
-}
-
-CIterator cbuf_iterator(CBuffer* b)
-{
-	return citer_make(b, (uintmax_t)(-1), &_cbuf_iterator_has_next, &_cbuf_iterator_next);
-}
+CBufferIterator cbuf_iter_begin(CBuffer* b) { return b->data; }
+CBufferIterator cbuf_iter_end(CBuffer* b) { return b->data + b->size; }
+int cbuf_iter_cmp(CBufferIterator* it0, CBufferIterator* it1) { return *it0 == *it1 ? 0 : *it0 < * it1 ? -1 : 1; }
+int cbuf_iter_next(CBufferIterator* it) { return *(++it) != '\0'; }
+char cbuf_iter_get(CBufferIterator* it) { return **it; }

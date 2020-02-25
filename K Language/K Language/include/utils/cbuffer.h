@@ -9,7 +9,6 @@ extern "C" {
 #include <stdarg.h>
 
 #include "cerror.h"
-#include "citer.h"
 
 	typedef struct
 	{
@@ -18,6 +17,8 @@ extern "C" {
 		size_t capacity;
 
 	} CBuffer;
+
+	typedef char* CBufferIterator;
 
 	status_t cbuf_init(CBuffer* b);
 	void cbuf_deinit(CBuffer* b);
@@ -56,7 +57,11 @@ extern "C" {
 
 	/* Iterator funcs */
 
-	CIterator cbuf_iterator(CBuffer* b);
+	CBufferIterator cbuf_iter_begin(CBuffer* b);
+	CBufferIterator cbuf_iter_end(CBuffer* b);
+	int cbuf_iter_cmp(CBufferIterator* it0, CBufferIterator* it1);
+	int cbuf_iter_next(CBufferIterator* it);
+	char cbuf_iter_get(CBufferIterator* it);
 
 
 	/* inline functions */

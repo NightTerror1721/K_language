@@ -150,6 +150,21 @@ static void _erase_node(CRawMap* m, Node* node)
 	}
 }
 
+static Node* _find_node(CRawMap* m, const char* key)
+{
+	if (!m)
+		return NULL;
+
+	hash_t hash = do_hash(key);
+	Node* node = m->buckets[_get_bucket(m, hash)];
+
+	for (; node; node = node->next)
+		if (strcmp(node->key, key) == 0)
+			return node;
+
+	return NULL;
+}
+
 
 
 
@@ -283,28 +298,23 @@ status_t crawmap_get(CRawMap* m, const char* key, void** ptr)
 	if (!m)
 		return S_UNEXPECTED_NULL;
 
-	Node* node = crawmap_find(m, key);
+	Node* node = _find_node(m, key);
 	*ptr = node ? node->data : NULL;
 
 	return S_OK;
 }
 
 
-CMapNode* crawmap_find(CRawMap* m, const char* key)
+CMapIterator crawmap_find(CRawMap* m, const char* key)
 {
-	if (!m)
-		return NULL;
-
-	hash_t hash = do_hash(key);
-	Node* node = m->buckets[_get_bucket(m, hash)];
+	Node* n = _find_node(m, key);
+	if(!n)
+		return crawmap_iter_end(m);
 	
-	for (; node; node = node->next)
-	{
-		if (strcmp(node->key, key) == 0)
-			return node;
-	}
-
-	return NULL;
+	CMapIterator it;
+	it.node = n;
+	it.bucket = _get_bucket(m, n->hash);
+	return it;
 }
 
 
@@ -314,21 +324,21 @@ int crawmap_erase(CRawMap* m, const char* key)
 	if (!m)
 		return 0;
 
-	Node* node = crawmap_find(m, key);
-	if (node)
+	Node* n = _find_node(m, key);
+	if (n)
 	{
-		_erase_node(m, node);
+		_erase_node(m, n);
 		return 1;
 	}
 
 	return 0;
 }
 
-int crawmap_erase_node(CRawMap* m, CMapNode* node)
+int crawmap_erase_it(CRawMap* m, CMapIterator it)
 {
-	if (node->owner == m)
+	if (it.node && it.node->owner == m)
 	{
-		_erase_node(m, node);
+		_erase_node(m, it.node);
 		return 1;
 	}
 	return 0;
@@ -362,31 +372,117 @@ void crawmap_clear(CRawMap* m)
 
 
 
-#define __NOINIT_IT (uintmax_t)(-1)
 
-/*static int _crawlist_iterator_has_next(void* c, uintmax_t* d)
+CMapIterator crawmap_iter_begin(CRawMap* m)
 {
-	return *d == __NOINIT_IT || ((Node*)(*d)) != NULL;
-}
-
-static void* _crawlist_iterator_next(void* c, uintmax_t* d)
-{
-	CRawMap* m = (CRawMap*)c;
-	if (*d == __NOINIT_IT)
+	CMapIterator it;
+	if (m->size < 1)
 	{
-		*d = (uintmax_t)(l->head);
-		return l->head ? l->head->data : NULL;
+		it.node = NULL;
+		it.bucket = m->n_buckets;
+		return it;
 	}
 
-	Node* n = (Node*)(*d);
-	if (!n)
+	for (size_t i = 0; i < m->n_buckets; ++i)
+	{
+		Node* n = m->buckets[i];
+		while (n)
+		{
+			if (n != NULL)
+			{
+				it.node = n;
+				it.bucket = i;
+				return it;
+			}
+			n = n->next;
+		}
+	}
+	
+	it.node = NULL;
+	it.bucket = m->n_buckets;
+	return it;
+}
+CMapIterator crawmap_iter_end(CRawMap* m)
+{
+	CMapIterator it = { m->n_buckets, NULL };
+	return it;
+}
+int crawmap_iter_equals(const CMapIterator it0, const CMapIterator it1)
+{
+	if (&it0 == &it1)
+		return 1;
+
+	if (!it0.node)
+		return !it1.node;
+	if (!it1.node)
+		return !it0.node;
+
+	return it0.bucket == it1.bucket && it0.node == it1.node;
+}
+int crawmap_iter_next(CMapIterator* it)
+{
+	if (!it->node)
+		return 0;
+
+	Node* n = it->node;
+	if (n->next)
+	{
+		it->node = n->next;
+		return 1;
+	}
+
+	CRawMap* m = n->owner;
+	for (size_t i = it->bucket + 1; i < m->n_buckets; ++i)
+	{
+		if (m->buckets[i] != NULL)
+		{
+			it->node = m->buckets[i];
+			it->bucket = i;
+			return 1;
+		}
+	}
+
+	it->node = NULL;
+	it->bucket = m->n_buckets;
+	return 0;
+}
+int crawmap_iter_get(CMapIterator it, void** ptr)
+{
+	if (!it.node)
+		return 0;
+
+	*ptr = it.node->data;
+	return 1;
+}
+const char* crawmap_iter_get_key(CMapIterator it)
+{
+	if (!it.node)
 		return NULL;
 
-	*d = (uintmax_t)n->next;
-	return n->next ? n->next->data : NULL;
-}*/
+	return it.node->key;
+}
 
-CIterator crawmap_iterator(CRawMap* m)
+
+
+
+
+
+void* _cmap_new(const size_t type_size)
 {
+	size_t size = sizeof(CRawMap) + type_size + sizeof(void*);
+	void* p = malloc(size);
+	if (!p)
+		return NULL;
 
+	memset(p, 0, size);
+	crawmap_init((CRawMap*)(p));
+	return p;
+}
+void _cmap_delete(void* pm)
+{
+	if (pm)
+	{
+		crawmap_deinit((CRawMap*)pm);
+		cdelete(pm);
+	}
 }

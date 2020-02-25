@@ -7,7 +7,6 @@ extern "C" {
 
 #include "cerror.h"
 #include "cutils.h"
-#include "citer.h"
 
 	typedef struct CRawList CRawList;
 
@@ -28,6 +27,8 @@ extern "C" {
 		size_t size;
 
 	};
+
+	typedef CListNode* CListIterator;
 
 
 	status_t crawlist_init(CRawList* l);
@@ -54,9 +55,9 @@ extern "C" {
 
 	/* Find operations */
 
-	CListNode* crawlist_find(CRawList* l, const void* ptr, const size_t size);
-	CListNode* crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t));
-	CListNode* crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t));
+	CListIterator crawlist_find(CRawList* l, const void* ptr, const size_t size);
+	CListIterator crawlist_find_if(CRawList* l, int (*criteria)(const void*, const size_t));
+	CListIterator crawlist_find_ifd(CRawList* l, void* extern_data, int (*criteria)(void*, const void*, const size_t));
 
 
 	/* Erase operations */
@@ -64,13 +65,18 @@ extern "C" {
 	status_t crawlist_erase_back(CRawList* l);
 	status_t crawlist_erase_front(CRawList* l);
 	status_t crawlist_erase(CRawList* l, const size_t index);
-	status_t crawlist_erase_node(CRawList* l, CListNode* node);
+	status_t crawlist_erase_node(CRawList* l, CListIterator it);
 	void crawlist_clear(CRawList* l);
 
 
 	/* Iterator operations */
 
-	CIterator crawlist_iterator(CRawList* l);
+	//CIterator crawlist_iterator(CRawList* l);
+	CListIterator crawlist_iter_begin(CRawList* l);
+	CListIterator crawlist_iter_end(CRawList* l);
+	int crawlist_iter_equals(const CListIterator it0, const CListIterator it1);
+	int crawlist_iter_next(CListIterator* it);
+	int crawlist_iter_get(CListIterator it, void** ptr);
 
 
 #define CList(_Type) struct { CRawList base; _Type temp; _Type* ref; }
@@ -100,10 +106,14 @@ extern "C" {
 #define clist_erase_back(_List) crawlist_erase_back(&(_List)->base)
 #define clist_erase_front(_List) crawlist_erase_front(&(_List)->base)
 #define clist_erase(_List, _Index) crawlist_erase(&(_List)->base, (_Index))
-#define clist_erase_node(_List, _Node) crawlist_erase_node(&(_List)->base, (_Node))
+#define clist_erase_node(_List, _Iter) crawlist_erase_node(&(_List)->base, (_Iter))
 #define clist_clear(_List) crawlist_clear(&(_List)->base)
 
-#define clist_iterator(_List) crawlist_iterator(&(_List)->base)
+#define clist_iter_begin(_List) crawlist_iter_begin(&(_List)->base)
+#define clist_iter_end(_List) crawlist_iter_end(&(_List)->base)
+#define clist_iter_equals crawlist_iter_equals
+#define clist_iter_next crawlist_iter_next
+#define clist_iter_get(_List, _Iter) (crawlist_iter_get(_Iter, (void**)(&(_List)->ref)), (_List)->ref)
 
 
 
