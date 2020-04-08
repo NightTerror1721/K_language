@@ -15,34 +15,5 @@
     <ClCompile Include="src\main.cpp">
       <Filter>main</Filter>
     </ClCompile>
-    <ClCompile Include="src\cbuffer.c">
-      <Filter>utils</Filter>
-    </ClCompile>
-    <ClCompile Include="src\clist.c">
-      <Filter>utils</Filter>
-    </ClCompile>
-    <ClCompile Include="src\cmap.c">
-      <Filter>utils</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\utils\cbuffer.h">
-      <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\utils\cerror.h">
-      <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\utils\cutils.h">
-      <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\utils\clist.h">
-      <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\utils\cmap.h">
-      <Filter>utils</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>
