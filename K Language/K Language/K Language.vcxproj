@@ -151,6 +151,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\rawmem.cpp" />
+    <ClCompile Include="src\script.cpp" />
+    <ClCompile Include="src\types.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\rawmem.h" />
+    <ClInclude Include="include\script.h" />
+    <ClInclude Include="include\types.h" />
+    <ClInclude Include="include\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

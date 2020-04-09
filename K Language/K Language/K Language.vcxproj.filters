@@ -1,19 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="main">
-      <UniqueIdentifier>{b3956023-cfcf-4486-b28b-4cbb64de6994}</UniqueIdentifier>
+    <Filter Include="include">
+      <UniqueIdentifier>{a82fe6bd-7456-41f3-b834-41ed1488d9d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="core">
-      <UniqueIdentifier>{7281432c-58bd-4103-944d-485cc6bc45b7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="utils">
-      <UniqueIdentifier>{ebf1c452-74c0-4696-8078-58fdfce1f093}</UniqueIdentifier>
+    <Filter Include="src">
+      <UniqueIdentifier>{fce4ea95-2f73-4d43-87fe-baf0f2bb339d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
-      <Filter>main</Filter>
+      <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\script.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\types.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rawmem.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\script.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\rawmem.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
