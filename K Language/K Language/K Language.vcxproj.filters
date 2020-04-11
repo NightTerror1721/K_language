@@ -21,6 +21,15 @@
     <ClCompile Include="src\rawmem.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\heap.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ref.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\script.h">
@@ -33,6 +42,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\heap.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ref.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

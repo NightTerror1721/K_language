@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <exception>
 
 namespace klang
 {
@@ -19,5 +20,20 @@ namespace klang
 	typedef UInt16 Word;
 	typedef UInt32 Long;
 	typedef UInt64 Quad;
+}
+
+namespace klang
+{
+	class KlangException : public std::exception
+	{
+	public:
+		KlangException() noexcept;
+		KlangException(const char* const message) noexcept;
+		KlangException(const std::string& message) noexcept;
+		KlangException(const KlangException&) = default;
+		~KlangException() = default;
+
+		KlangException& operator= (const KlangException&) = default;
+	};
 }
 

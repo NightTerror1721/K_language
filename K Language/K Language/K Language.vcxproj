@@ -150,13 +150,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\heap.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\rawmem.cpp" />
+    <ClCompile Include="src\ref.cpp" />
     <ClCompile Include="src\script.cpp" />
     <ClCompile Include="src\types.cpp" />
+    <ClCompile Include="src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\heap.h" />
     <ClInclude Include="include\rawmem.h" />
+    <ClInclude Include="include\ref.h" />
     <ClInclude Include="include\script.h" />
     <ClInclude Include="include\types.h" />
     <ClInclude Include="include\utils.h" />
