@@ -17,6 +17,8 @@ namespace klang
 
 }
 
+namespace klang::stack { struct Stack; }
+
 namespace klang::type
 {
 	
@@ -86,7 +88,7 @@ namespace klang::type
 		virtual operator float() const = 0;
 		virtual operator double() const = 0;
 		virtual operator bool() const = 0;
-		virtual operator std::string() const;
+		virtual operator std::wstring() const;
 		virtual operator ValueVector() const;
 		virtual operator ValueMap() const;
 
@@ -124,11 +126,7 @@ namespace klang::type
 	public: //Object operators
 		virtual Value* klang_operatorGetProperty(const std::string& name);
 		virtual void klang_operatorGetProperty(const std::string& name, Value* value);
-		/*virtual Value* klang_operatorCall(Value* self);
-		virtual Value* klang_operatorCall(Value* self, Value* arg0);
-		virtual Value* klang_operatorCall(Value* self, Value* arg0, Value* arg1);
-		virtual Value* klang_operatorCall(Value* self, Value* arg0, Value* arg1, Value* arg2);
-		virtual Value* klang_operatorCall(Value* self, Variadic&& args);*/
+		//virtual Value* klang_operatorCall(klang::stack::Stack& stack);
 
 	public: //Reference operators
 		virtual Value* klang_operatorReferenceGet();
@@ -174,6 +172,7 @@ namespace klang::type
 	};
 
 	std::string GetTypeName(Value::Type type);
+	std::wstring GetTypeWName(Value::Type type);
 
 
 
@@ -189,7 +188,7 @@ namespace klang::type
 		operator float() const override;
 		operator double() const override;
 		operator bool() const override;
-		operator std::string() const override;
+		operator std::wstring() const override;
 
 		Value* klang_operatorNot() override;
 
@@ -218,7 +217,7 @@ namespace klang::type
 		operator float() const override;
 		operator double() const override;
 		operator bool() const override;
-		operator std::string() const override;
+		operator std::wstring() const override;
 
 	public: //Common operators
 		Value* klang_operatorEquals(Value* value) override;
@@ -317,7 +316,7 @@ namespace klang::type
 			operator float() const override { return static_cast<float>(_value); }
 			operator double() const override { return static_cast<double>(_value); }
 			operator bool() const override { return static_cast<bool>(_value); }
-			operator std::string() const override { return std::to_string(_value); }
+			operator std::wstring() const override { return std::to_wstring(_value); }
 
 		public: //Common operators
 			Value* klang_operatorEquals(Value* value) override
@@ -536,6 +535,57 @@ namespace klang::type
 	inline LongInteger* newLongInteger(const Int64 value) { return heap::create<LongInteger>(value); }
 	inline Float* newFloat(const float value) { return heap::create<Float>(value); }
 	inline Double* newDouble(const double value) { return heap::create<Double>(value); }
+
+
+
+	class String : public Value
+	{
+	private:
+		wchar_t* const _value;
+		const size_t _size;
+
+	public:
+		String(const std::wstring& value);
+		~String();
+
+	public: //To c++ conversions
+		operator Int32() const override;
+		operator Int64() const override;
+		operator float() const override;
+		operator double() const override;
+		operator bool() const override;
+		operator std::wstring() const override;
+
+	public: //Common operators
+		Value* klang_operatorEquals(Value* value) override;
+		Value* klang_operatorNotEquals(Value* value) override;
+		Value* klang_operatorGreater(Value* value) override;
+		Value* klang_operatorLess(Value* value) override;
+		Value* klang_operatorGreaterEquals(Value* value) override;
+		Value* klang_operatorLessEquals(Value* value) override;
+		Value* klang_operatorNot() override;
+
+	public: //Math operators
+		Value* klang_operatorPlus(Value* value) override;
+
+	public: //Array/List operators
+		virtual Value* klang_operatorArrayGet(Value* index) override;
+
+	public:
+		static void* operator new(size_t size) = delete;
+		static void* operator new(size_t size, const std::wstring& str);
+		static void operator delete(void* p);
+	};
+
+	inline String* newString(const std::wstring& value) { return heap::create<String>(value); }
+
+
+
+
+	/*class Array : public Value
+	{
+
+	};*/
 }
 
 
@@ -547,4 +597,4 @@ namespace klang::type::constant
 	extern Value* const False;
 }
 
-std::ostream& operator<< (std::ostream& os, const klang::type::Value& value);
+std::wostream& operator<< (std::wostream& os, const klang::type::Value& value);

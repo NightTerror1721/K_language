@@ -30,6 +30,9 @@
     <ClCompile Include="src\ref.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\stacks.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\script.h">
@@ -48,6 +51,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\ref.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stacks.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

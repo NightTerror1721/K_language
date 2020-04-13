@@ -17,16 +17,57 @@ namespace klang::type
 
 namespace klang::type
 {
+	std::wstring GetTypeWName(Value::Type type)
+	{
+		using Type = Value::Type;
+		switch (type)
+		{
+			case Type::Undefined: return L"undefined";
+			case Type::Integer: return L"integer";
+			case Type::Float: return L"float";
+			case Type::Boolean: return L"boolean";
+			case Type::String: return L"string";
+			case Type::Function: return L"function";
+			case Type::Reference: return L"reference";
+			case Type::Array: return L"array";
+			case Type::List: return L"list";
+			case Type::Object: return L"object";
+		}
+		return L"";
+	}
+
+	std::string GetTypeName(Value::Type type)
+	{
+		using Type = Value::Type;
+		switch (type)
+		{
+			case Type::Undefined: return "undefined";
+			case Type::Integer: return "integer";
+			case Type::Float: return "float";
+			case Type::Boolean: return "boolean";
+			case Type::String: return "string";
+			case Type::Function: return "function";
+			case Type::Reference: return "reference";
+			case Type::Array: return "array";
+			case Type::List: return "list";
+			case Type::Object: return "object";
+		}
+		return "";
+	}
+}
+
+namespace klang::type
+{
 	unsigned int Value::narg() const { return 1; }
 	Value* Value::arg0() { return this; }
 	Value* Value::arg(unsigned int index) { return index == 0 ? this : nullptr; }
 
 	std::string Value::getKlangTypeName() const { return GetTypeName(type); }
 
-	Value::operator std::string() const
+	Value::operator std::wstring() const
 	{
-		std::stringstream ss;
-		ss << GetTypeName(klangType()) << "::" << this;
+		std::wstringstream ss;
+		ss << GetTypeWName(klangType()) << "::" << this;
 		return ss.str();
 	}
 	Value::operator ValueVector() const { return { const_cast<Value*>(this) }; };
@@ -79,25 +120,6 @@ namespace klang::type
 	Value* Value::klang_operatorIterator() { throw UnsupportedException{ *this, "klang_operatorIterator" }; }
 	Value* Value::klang_operatorHasNext() { throw UnsupportedException{ *this, "klang_operatorHasNext" }; }
 	Value* Value::klang_operatorNext() { throw UnsupportedException{ *this, "klang_operatorNext" }; }
-
-	std::string GetTypeName(Value::Type type)
-	{
-		using Type = Value::Type;
-		switch (type)
-		{
-			case Type::Undefined: return "undefined";
-			case Type::Integer: return "integer";
-			case Type::Float: return "float";
-			case Type::Boolean: return "boolean";
-			case Type::String: return "string";
-			case Type::Function: return "function";
-			case Type::Reference: return "reference";
-			case Type::Array: return "array";
-			case Type::List: return "list";
-			case Type::Object: return "object";
-		}
-		return "";
-	}
 }
 
 
@@ -129,7 +151,7 @@ namespace klang::type
 #define INT64(_Expr) static_cast<klang::Int64>(_Expr)
 #define FLOAT(_Expr) static_cast<float>(_Expr)
 #define DOUBLE(_Expr) static_cast<double>(_Expr)
-#define STRING(_Expr) static_cast<std::string>(_Expr)
+#define STRING(_Expr) static_cast<std::wstring>(_Expr)
 
 #define TRUE klang::type::constant::True
 #define FALSE klang::type::constant::False
@@ -156,7 +178,7 @@ namespace klang::type
 	Undefined::operator float() const { return 0; }
 	Undefined::operator double() const { return 0; }
 	Undefined::operator bool() const { return false; }
-	Undefined::operator std::string() const { return "undefined"; }
+	Undefined::operator std::wstring() const { return L"undefined"; }
 
 	Value* Undefined::klang_operatorNot() { return constant::True; }
 
@@ -184,7 +206,7 @@ namespace klang::type
 	Boolean::operator float() const { return _value; }
 	Boolean::operator double() const { return _value; }
 	Boolean::operator bool() const { return _value; }
-	Boolean::operator std::string() const { return _value ? "true" : "false"; }
+	Boolean::operator std::wstring() const { return _value ? L"true" : L"false"; }
 
 	Value* Boolean::klang_operatorEquals(Value* value) { return BOOL_TEST(_value == BOOL(*value)); }
 	Value* Boolean::klang_operatorNotEquals(Value* value) { return BOOL_TEST(_value != BOOL(*value)); }
@@ -221,6 +243,57 @@ namespace klang::type
 
 
 
+// String //
+namespace klang::type
+{
+	String::String(const std::wstring& value) :
+		Value{ Type::String },
+		_size{ value.size() },
+		_value{ reinterpret_cast<wchar_t*>(heap::malloc(sizeof(wchar_t) * (value.size() + 1))) }
+	{
+		heap::incref(_value);
+		std::wmemcpy(_value, value.data(), _size);
+		_value[_size] = L'\0';
+	}
+	String::~String()
+	{
+		heap::decref(_value);
+		heap::free(_value);
+	}
+
+	String::operator Int32() const { return std::stol(_value); }
+	String::operator Int64() const { return std::stoll(_value); }
+	String::operator float() const { return std::stof(_value); }
+	String::operator double() const { return std::stod(_value); }
+	String::operator bool() const { return _size > 1; }
+	String::operator std::wstring() const { return _value; }
+
+	Value* String::klang_operatorEquals(Value* value) { return BOOL_TEST(_value == static_cast<std::wstring>(*value)); }
+	Value* String::klang_operatorNotEquals(Value* value) { return BOOL_TEST(_value != static_cast<std::wstring>(*value)); }
+	Value* String::klang_operatorGreater(Value* value) { return BOOL_TEST(_value > static_cast<std::wstring>(*value)); }
+	Value* String::klang_operatorLess(Value* value) { return BOOL_TEST(_value < static_cast<std::wstring>(*value)); }
+	Value* String::klang_operatorGreaterEquals(Value* value) { return BOOL_TEST(_value >= static_cast<std::wstring>(*value)); }
+	Value* String::klang_operatorLessEquals(Value* value) { return BOOL_TEST(_value <= static_cast<std::wstring>(*value)); }
+	Value* String::klang_operatorNot() { return BOOL_TEST(_size <= 1); }
+
+	Value* String::klang_operatorPlus(Value* value) { return newString(_value + static_cast<std::wstring>(*value)); }
+
+	Value* String::klang_operatorArrayGet(Value* index)
+	{
+		size_t idx = static_cast<size_t>(INT64(*index));
+		if (idx >= _size)
+			return constant::Undefined;
+		return newString(std::wstring(_value + idx, 1));
+	}
+
+	void* String::operator new(size_t size, const std::wstring& str) { return newString(str); }
+	void String::operator delete(void* p) { heap::destroy(reinterpret_cast<String*>(p)); }
+}
+
+
+
+
+
 
 
 namespace klang::type::constant
@@ -230,7 +303,7 @@ namespace klang::type::constant
 	extern Value* const False = Boolean::False;
 }
 
-std::ostream& operator<< (std::ostream& os, const klang::type::Value& value)
+std::wostream& operator<< (std::wostream& os, const klang::type::Value& value)
 {
-	return os << static_cast<std::string>(value);
+	return os << static_cast<std::wstring>(value);
 }

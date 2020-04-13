@@ -32,6 +32,60 @@ namespace klang
 
 
 	public:
+		// Array access operator //
+		class ArrayAccessor
+		{
+		private:
+			klang::type::Value* const _value;
+			klang::type::Value* const _index;
+
+		public:
+			constexpr ArrayAccessor(klang::type::Value* const value, klang::type::Value* const index) :
+				_value{ value ? value : klang::type::constant::Undefined },
+				_index{ index ? index : klang::type::constant::Undefined }
+			{}
+			constexpr ArrayAccessor(const klang::type::Value* const value, const klang::type::Value* const index) :
+				ArrayAccessor{ const_cast<klang::type::Value*>(value), const_cast<klang::type::Value*>(index) }
+			{}
+			inline ArrayAccessor(klang::type::Value* const value, const size_t index) :
+				ArrayAccessor{ value, klang::type::newLongInteger(static_cast<Int64>(index)) }
+			{}
+			inline ArrayAccessor(const klang::type::Value* const value, const size_t index) :
+				ArrayAccessor{ const_cast<klang::type::Value*>(value), klang::type::newLongInteger(static_cast<Int64>(index)) }
+			{}
+
+			ArrayAccessor(const ArrayAccessor&) = delete;
+			ArrayAccessor& operator= (const ArrayAccessor&) = delete;
+
+			inline ArrayAccessor& operator= (klang::type::Value* const value)
+			{
+				return _value->klang_operatorArraySet(_index, value), *this;
+			}
+			inline ArrayAccessor& operator= (Ref& value)
+			{
+				return _value->klang_operatorArraySet(_index, value), * this;
+			}
+			inline ArrayAccessor& operator= (Ref&& value)
+			{
+				return _value->klang_operatorArraySet(_index, value), * this;
+			}
+
+			inline operator Ref() const { return const_cast<klang::type::Value*>(_value)->klang_operatorArrayGet(_index); }
+		};
+
+		Ref::ArrayAccessor operator[] (const size_t index);
+		Ref::ArrayAccessor operator[] (const int index);
+		Ref::ArrayAccessor operator[] (Ref& index);
+		Ref::ArrayAccessor operator[] (Ref&& index);
+
+		const Ref::ArrayAccessor operator[] (const size_t index) const;
+		const Ref::ArrayAccessor operator[] (const int index) const;
+		const Ref::ArrayAccessor operator[] (Ref& index) const;
+		const Ref::ArrayAccessor operator[] (Ref&& index) const;
+
+
+
+	public:
 		/* NULL values */
 		Ref(decltype(nullptr));
 		Ref& operator= (decltype(nullptr));
@@ -71,10 +125,16 @@ namespace klang
 		Ref(const double value);
 		Ref& operator= (const double value);
 		operator double() const;
+
+
+		/* String values */
+		Ref(const std::wstring& value);
+		Ref& operator= (const std::wstring& value);
+		operator std::wstring () const;
 	};
 }
 
-std::ostream& operator<< (std::ostream& os, const klang::Ref& ref);
+std::wostream& operator<< (std::wostream& os, const klang::Ref& ref);
 
 
 

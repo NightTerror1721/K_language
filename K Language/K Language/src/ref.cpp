@@ -64,6 +64,18 @@ namespace klang
 
 
 
+	Ref::ArrayAccessor Ref::operator[] (const size_t index) { return { _value, index }; }
+	Ref::ArrayAccessor Ref::operator[] (const int index) { return { _value, static_cast<size_t>(index) }; }
+	Ref::ArrayAccessor Ref::operator[] (Ref& index) { return { _value, static_cast<Value*>(index) }; }
+	Ref::ArrayAccessor Ref::operator[] (Ref&& index) { return { _value, static_cast<Value*>(index) }; }
+
+	const Ref::ArrayAccessor Ref::operator[] (const size_t index) const { return { _value, index }; }
+	const Ref::ArrayAccessor Ref::operator[] (const int index) const { return { _value, static_cast<size_t>(index) }; }
+	const Ref::ArrayAccessor Ref::operator[] (Ref& index) const { return { _value, static_cast<Value*>(index) }; }
+	const Ref::ArrayAccessor Ref::operator[] (Ref&& index) const { return { _value, static_cast<Value*>(index) }; }
+
+
+
 
 
 	Ref::Ref(decltype(nullptr)) : Ref{ ct::Undefined } {}
@@ -99,9 +111,14 @@ namespace klang
 	Ref::Ref(const double value) : Ref{ newDouble(value) } {}
 	Ref& Ref::operator= (const double value) { return *this = newDouble(value); }
 	Ref::operator double() const { return static_cast<double>(*_value); }
+
+
+	Ref::Ref(const std::wstring& value) : Ref{ newString(value) } {}
+	Ref& Ref::operator= (const std::wstring& value) { return *this = newString(value); }
+	Ref::operator std::wstring() const { return static_cast<std::wstring>(*_value); }
 }
 
-std::ostream& operator<< (std::ostream& os, const klang::Ref& ref)
+std::wostream& operator<< (std::wostream& os, const klang::Ref& ref)
 {
 	return os << *static_cast<const klang::type::Value*>(ref);
 }

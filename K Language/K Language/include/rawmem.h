@@ -14,6 +14,9 @@ namespace klang::heap
 
 	void* s_malloc(const size_t size);
 
+	size_t capacity();
+	size_t used();
+
 
 
 	template<class _Ty>

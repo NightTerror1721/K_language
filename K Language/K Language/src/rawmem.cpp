@@ -57,4 +57,7 @@ namespace klang::heap
 			return nullptr;
 		return ptr;
 	}
+
+	size_t capacity() { return Heap::Default.mem.capacity; }
+	size_t used() { return Heap::Default.mem.used; }
 }
